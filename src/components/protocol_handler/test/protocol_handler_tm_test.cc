@@ -2724,6 +2724,9 @@ TEST_F(ProtocolHandlerImplTest, FloodVerification) {
       .WillOnce(NotifyTestAsyncWaiter(waiter));
   times++;
 
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
+
   connection_handler::SessionTransports st;
   st.primary_transport = connection_id;
   ON_CALL(connection_handler_mock, GetSessionTransports(session_id))
@@ -2747,7 +2750,7 @@ TEST_F(ProtocolHandlerImplTest, FloodVerification) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, FloodVerification_ThresholdValue) {
@@ -2765,6 +2768,9 @@ TEST_F(ProtocolHandlerImplTest, FloodVerification_ThresholdValue) {
       .WillByDefault(Return(period_msec));
   ON_CALL(protocol_handler_settings_mock, message_frequency_count())
       .WillByDefault(Return(max_messages));
+
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
 
   // Expect NO flood notification to CH
   EXPECT_CALL(session_observer_mock, OnApplicationFloodCallBack(connection_key))
@@ -2788,7 +2794,7 @@ TEST_F(ProtocolHandlerImplTest, FloodVerification_ThresholdValue) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, FloodVerification_VideoFrameSkip) {
@@ -2807,6 +2813,9 @@ TEST_F(ProtocolHandlerImplTest, FloodVerification_VideoFrameSkip) {
   ON_CALL(connection_handler_mock, GetSessionTransports(session_id))
       .WillByDefault(Return(st));
 
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
+
   // Expect NO flood notification to CH on video data streaming
   for (size_t i = 0; i < max_messages + 1; ++i) {
     SendTMMessage(connection_id,
@@ -2821,7 +2830,7 @@ TEST_F(ProtocolHandlerImplTest, FloodVerification_VideoFrameSkip) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, FloodVerification_AudioFrameSkip) {
@@ -2840,6 +2849,9 @@ TEST_F(ProtocolHandlerImplTest, FloodVerification_AudioFrameSkip) {
   ON_CALL(connection_handler_mock, GetSessionTransports(session_id))
       .WillByDefault(Return(st));
 
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
+
   // Expect NO flood notification to CH on video data streaming
   for (size_t i = 0; i < max_messages + 1; ++i) {
     SendTMMessage(connection_id,
@@ -2854,7 +2866,7 @@ TEST_F(ProtocolHandlerImplTest, FloodVerification_AudioFrameSkip) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, FloodVerificationDisable) {
@@ -2873,6 +2885,9 @@ TEST_F(ProtocolHandlerImplTest, FloodVerificationDisable) {
   ON_CALL(connection_handler_mock, GetSessionTransports(session_id))
       .WillByDefault(Return(st));
 
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
+
   // Expect NO flood notification to session observer
   for (size_t i = 0; i < max_messages + 1; ++i) {
     SendTMMessage(connection_id,
@@ -2887,7 +2902,7 @@ TEST_F(ProtocolHandlerImplTest, FloodVerificationDisable) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, MalformedVerificationDisable) {
@@ -2943,6 +2958,9 @@ TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification) {
   ON_CALL(connection_handler_mock, GetSessionTransports(session_id))
       .WillByDefault(Return(st));
 
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
+
   // Sending malformed packets
   const uint8_t malformed_version = PROTOCOL_VERSION_MAX;
   for (size_t i = 0; i < max_messages * 2; ++i) {
@@ -2970,7 +2988,7 @@ TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification_MalformedStock) {
@@ -2993,6 +3011,9 @@ TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification_MalformedStock) {
   st.primary_transport = connection_id;
   ON_CALL(connection_handler_mock, GetSessionTransports(session_id))
       .WillByDefault(Return(st));
+
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
 
   // Sending malformed packets
   const uint8_t malformed_version = PROTOCOL_VERSION_MAX;
@@ -3046,7 +3067,7 @@ TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification_MalformedStock) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification_MalformedOnly) {
@@ -3195,6 +3216,9 @@ TEST_F(ProtocolHandlerImplTest, SendEndServicePrivate_EndSession_MessageSent) {
 
   AddSession(waiter, times);
 
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
+
   // Expect check connection with ProtocolVersionUsed
   EXPECT_CALL(session_observer_mock,
               ProtocolVersionUsed(connection_id, session_id, _))
@@ -3208,7 +3232,7 @@ TEST_F(ProtocolHandlerImplTest, SendEndServicePrivate_EndSession_MessageSent) {
   // Act
   protocol_handler_impl->SendEndSession(connection_id, session_id);
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest,
@@ -3334,6 +3358,9 @@ TEST_F(ProtocolHandlerImplTest, SendHeartBeatAck_WrongProtocolVersion_NotSent) {
 
   AddSession(waiter, times);
 
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
+
   // Expect two checks of connection and protocol version with
   // ProtocolVersionUsed
   EXPECT_CALL(session_observer_mock, ProtocolVersionUsed(connection_id, _, _))
@@ -3352,7 +3379,7 @@ TEST_F(ProtocolHandlerImplTest, SendHeartBeatAck_WrongProtocolVersion_NotSent) {
   SendControlMessage(
       PROTECTION_OFF, kControl, session_id, FRAME_DATA_HEART_BEAT);
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest,
@@ -4358,6 +4385,9 @@ TEST_F(ProtocolHandlerImplTest,
 
   AddSession(waiter, times);
 
+  ON_CALL(session_observer_mock, KeyFromPair(connection_id, session_id))
+      .WillByDefault(Return(connection_key));
+
   ProtocolFramePtr frame_ptr =
       std::make_shared<ProtocolPacket>(connection_id,
                                        PROTOCOL_VERSION_3,
@@ -4381,7 +4411,7 @@ TEST_F(ProtocolHandlerImplTest,
 
   tm_listener->OnTMMessageReceived(frame_ptr->serializePacket());
 
-  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest,
