@@ -154,6 +154,7 @@ const uint8_t* const null_data_ = NULL;
 const uint32_t kInvalidSessionId = 0u;
 const uint32_t kValidSessionId = 1u;
 const uint32_t kAsyncExpectationsTimeout = 10000u;
+const uint32_t kExtAsyncExpectationsTimeout = 20000u;
 const uint32_t kMicrosecondsInMillisecond = 1000u;
 const uint32_t kAddSessionWaitTimeMs = 100u;
 }
@@ -2707,7 +2708,7 @@ TEST_F(ProtocolHandlerImplTest, RegisterSecondaryTransport_FAILURE) {
   EXPECT_TRUE(waiter.WaitFor(times, kAsyncExpectationsTimeout));
 }
 
-TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerification) {
+TEST_F(ProtocolHandlerImplTest, FloodVerification) {
   const size_t period_msec = 10000;
   const size_t max_messages = 1000;
   InitProtocolHandlerImpl(period_msec, max_messages);
@@ -2746,10 +2747,10 @@ TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerification) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, period_msec));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
-TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerification_ThresholdValue) {
+TEST_F(ProtocolHandlerImplTest, FloodVerification_ThresholdValue) {
   const size_t period_msec = 10000;
   const size_t max_messages = 1000;
   InitProtocolHandlerImpl(period_msec, max_messages);
@@ -2787,10 +2788,10 @@ TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerification_ThresholdValue) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, period_msec));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
-TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerification_VideoFrameSkip) {
+TEST_F(ProtocolHandlerImplTest, FloodVerification_VideoFrameSkip) {
   const size_t period_msec = 10000;
   const size_t max_messages = 1000;
   InitProtocolHandlerImpl(period_msec, max_messages);
@@ -2820,10 +2821,10 @@ TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerification_VideoFrameSkip) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, period_msec));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
-TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerification_AudioFrameSkip) {
+TEST_F(ProtocolHandlerImplTest, FloodVerification_AudioFrameSkip) {
   const size_t period_msec = 10000;
   const size_t max_messages = 1000;
   InitProtocolHandlerImpl(period_msec, max_messages);
@@ -2853,10 +2854,10 @@ TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerification_AudioFrameSkip) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, period_msec));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
-TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerificationDisable) {
+TEST_F(ProtocolHandlerImplTest, FloodVerificationDisable) {
   const size_t period_msec = 0;
   const size_t max_messages = 0;
   InitProtocolHandlerImpl(period_msec, max_messages);
@@ -2886,7 +2887,7 @@ TEST_F(ProtocolHandlerImplTest, DISABLED_FloodVerificationDisable) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, MalformedVerificationDisable) {
@@ -2921,7 +2922,7 @@ TEST_F(ProtocolHandlerImplTest, MalformedVerificationDisable) {
   EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
-TEST_F(ProtocolHandlerImplTest, DISABLED_MalformedLimitVerification) {
+TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification) {
   const size_t period_msec = 10000;
   const size_t max_messages = 100;
   InitProtocolHandlerImpl(0u, 0u, true, period_msec, max_messages);
@@ -2969,11 +2970,10 @@ TEST_F(ProtocolHandlerImplTest, DISABLED_MalformedLimitVerification) {
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
-TEST_F(ProtocolHandlerImplTest,
-       DISABLED_MalformedLimitVerification_MalformedStock) {
+TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification_MalformedStock) {
   const size_t period_msec = 10000;
   const size_t max_messages = 100;
   InitProtocolHandlerImpl(0u, 0u, true, period_msec, max_messages);
@@ -3046,7 +3046,7 @@ TEST_F(ProtocolHandlerImplTest,
                   &some_data[0]);
   }
 
-  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest, MalformedLimitVerification_MalformedOnly) {
@@ -3188,8 +3188,7 @@ TEST_F(ProtocolHandlerImplTest,
   protocol_handler_impl->SendEndSession(connection_id, session_id);
 }
 
-TEST_F(ProtocolHandlerImplTest,
-       DISABLED_SendEndServicePrivate_EndSession_MessageSent) {
+TEST_F(ProtocolHandlerImplTest, SendEndServicePrivate_EndSession_MessageSent) {
   // Arrange
   std::shared_ptr<TestAsyncWaiter> waiter = std::make_shared<TestAsyncWaiter>();
   uint32_t times = 0;
@@ -3209,7 +3208,7 @@ TEST_F(ProtocolHandlerImplTest,
   // Act
   protocol_handler_impl->SendEndSession(connection_id, session_id);
 
-  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest,
@@ -3328,8 +3327,7 @@ TEST_F(ProtocolHandlerImplTest,
   EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
 }
 
-TEST_F(ProtocolHandlerImplTest,
-       DISABLED_SendHeartBeatAck_WrongProtocolVersion_NotSent) {
+TEST_F(ProtocolHandlerImplTest, SendHeartBeatAck_WrongProtocolVersion_NotSent) {
   // Arrange
   std::shared_ptr<TestAsyncWaiter> waiter = std::make_shared<TestAsyncWaiter>();
   uint32_t times = 0;
@@ -3354,7 +3352,7 @@ TEST_F(ProtocolHandlerImplTest,
   SendControlMessage(
       PROTECTION_OFF, kControl, session_id, FRAME_DATA_HEART_BEAT);
 
-  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest,
@@ -4383,7 +4381,7 @@ TEST_F(ProtocolHandlerImplTest,
 
   tm_listener->OnTMMessageReceived(frame_ptr->serializePacket());
 
-  EXPECT_TRUE(waiter->WaitFor(times, kAsyncExpectationsTimeout));
+  EXPECT_TRUE(waiter->WaitFor(times, kExtAsyncExpectationsTimeout));
 }
 
 TEST_F(ProtocolHandlerImplTest,
